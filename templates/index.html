@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Maps Business Scraper — Free</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
+</head>
+<body>
+<div class="wrapper">
+
+  <header>
+    <div class="logo-badge"><span></span>Playwright Browser Scraper</div>
+    <h1>Maps Business<br>Scraper</h1>
+    <p class="subtitle">Scrape Google Maps business data for free — no API key, no credit card needed.</p>
+    <div class="free-badge">&#10003; 100% Free — Powered by Playwright</div>
+  </header>
+
+  <div class="search-card">
+    <form id="search-form">
+      <div class="search-grid">
+        <div class="field-group">
+          <label for="keyword">&#128269; Keyword / Business Type</label>
+          <input id="keyword" type="text" placeholder="e.g. CA office, car service, dentist" required/>
+        </div>
+        <div class="field-group">
+          <label for="location">&#128205; City / Area</label>
+          <input id="location" type="text" placeholder="e.g. Jaipur, Mumbai, Delhi NCR"/>
+        </div>
+      </div>
+
+      <div class="count-row">
+        <label>
+          Max Results
+          <span id="max-value">20 results</span>
+        </label>
+        <input type="range" id="max-results" min="5" max="40" value="20" step="5"/>
+      </div>
+
+      <div class="warn-box">
+        <span class="icon">&#9203;</span>
+        <span>Scraping opens a real browser — expect <strong>30–90 seconds</strong> per search. Do not close this tab.</span>
+      </div>
+
+      <button class="btn-search" type="submit" id="search-btn">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        Scrape Google Maps
+      </button>
+    </form>
+  </div>
+
+  <div id="status-bar">
+    <div class="spinner"></div>
+    <div>
+      <div id="status-text">Opening browser…</div>
+      <div class="status-detail">Browser is running in the background — please wait</div>
+    </div>
+  </div>
+
+  <div id="error-toast">
+    <span>&#9888;&#65039;</span>
+    <span id="error-msg"></span>
+  </div>
+
+  <div id="empty-state">
+    <div class="icon">&#128506;&#65039;</div>
+    <h3>No results found</h3>
+    <p>Try a different keyword or add a city name.</p>
+  </div>
+
+  <div id="results-area" style="display:none">
+    <div class="results-header">
+      <div class="results-count">
+        Results <span class="count-badge" id="result-count">0</span>
+      </div>
+      <div class="export-btns">
+        <button class="btn-export" onclick="exportData('excel')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+          </svg>
+          Excel (.xlsx)
+        </button>
+        <button class="btn-export" onclick="exportData('pdf')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+          PDF
+        </button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th><th>Category</th><th>Rating</th>
+            <th>Reviews</th><th>Phone</th><th>Address</th><th>Website</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

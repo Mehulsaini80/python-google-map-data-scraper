@@ -1,0 +1,1 @@
+# Playwright Maps Scraper package
