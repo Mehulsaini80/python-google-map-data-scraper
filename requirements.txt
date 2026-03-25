@@ -1,9 +1,44 @@
+# ═══════════════════════════════════════════════════════
+#   Google Maps Playwright Scraper — Requirements
+#   Compatible with Python 3.11 (recommended)
+#   Install: pip install -r requirements.txt
+#   Then:    playwright install chromium
+# ═══════════════════════════════════════════════════════
+
+# ─── Web Framework ───────────────────────────────────
 flask
+werkzeug
+jinja2
+itsdangerous
+click
 python-dotenv
+
+# ─── Browser Scraping (FREE - No API Key) ────────────
 playwright
+
+# ─── Data Handling ───────────────────────────────────
 pandas
+
+# ─── Excel Export ────────────────────────────────────
 openpyxl
 xlsxwriter
+
+# ─── PDF Export ──────────────────────────────────────
 reportlab
 pillow
+
+# ─── HTTP & Networking ───────────────────────────────
 requests
+urllib3
+certifi
+charset-normalizer 
+idna
+
+# ─── Utilities ───────────────────────────────────────
+python-dateutil
+pytz
+six
+typing-extensions
+
+# ─── Database (SQLite is built into Python) ──────────
+# No extra install needed for sqlite3 

@@ -9,37 +9,57 @@
 <body>
 <div class="wrapper">
 
+  <!-- Header -->
   <header>
     <div class="logo-badge"><span></span>Playwright Browser Scraper</div>
     <h1>Maps Business<br>Scraper</h1>
-    <p class="subtitle">Scrape Google Maps business data for free — no API key, no credit card needed.</p>
-    <div class="free-badge">&#10003; 100% Free — Powered by Playwright</div>
+    <p class="subtitle">Multi-keyword search · 200 results · Auto deduplication · SQLite storage</p>
+    <div class="free-badge">&#10003; 100% Free — No API Key</div>
   </header>
 
+  <!-- DB Stats Bar -->
+  <div class="db-bar" id="db-bar">
+    <div class="db-stat">
+      <span class="db-icon">🗄️</span>
+      <span>Database: <strong id="db-count">—</strong> unique records stored</span>
+    </div>
+    <div class="db-actions">
+      <a href="/api/export/all/excel" class="btn-db">&#11123; Export All (Excel)</a>
+      <a href="/api/export/all/pdf"   class="btn-db">&#11123; Export All (PDF)</a>
+      <button class="btn-db btn-danger" onclick="clearDB()">&#128465; Clear DB</button>
+    </div>
+  </div>
+
+  <!-- Search Card -->
   <div class="search-card">
     <form id="search-form">
-      <div class="search-grid">
-        <div class="field-group">
-          <label for="keyword">&#128269; Keyword / Business Type</label>
-          <input id="keyword" type="text" placeholder="e.g. CA office, car service, dentist" required/>
-        </div>
-        <div class="field-group">
-          <label for="location">&#128205; City / Area</label>
-          <input id="location" type="text" placeholder="e.g. Jaipur, Mumbai, Delhi NCR"/>
+
+      <!-- Keywords -->
+      <div class="section-label">🔍 Search Queries</div>
+      <p class="section-hint">Enter one query per line. Be specific — include business type + location.<br>
+        Examples: <em>CA in Vaishali Nagar Jaipur</em> · <em>car service center Mansarovar</em> · <em>cafe C-scheme Jaipur</em>
+      </p>
+      <div id="keyword-list">
+        <div class="keyword-row">
+          <input class="kw-input" type="text" placeholder="e.g. CA in Vaishali Nagar Jaipur"/>
+          <button type="button" class="btn-remove-kw" onclick="removeKeyword(this)" title="Remove">✕</button>
         </div>
       </div>
+      <button type="button" class="btn-add-kw" onclick="addKeyword()">+ Add another keyword</button>
 
-      <div class="count-row">
+      <!-- Max results slider -->
+      <div class="count-row" style="margin-top:24px">
         <label>
-          Max Results
-          <span id="max-value">20 results</span>
+          Max Results per keyword
+          <span id="max-value">40 results</span>
         </label>
-        <input type="range" id="max-results" min="5" max="40" value="20" step="5"/>
+        <input type="range" id="max-results" min="10" max="200" value="40" step="10"/>
+        <p class="slider-note">⚡ More results = longer scrape time. 200 results ≈ 10–15 min per keyword.</p>
       </div>
 
       <div class="warn-box">
-        <span class="icon">&#9203;</span>
-        <span>Scraping opens a real browser — expect <strong>30–90 seconds</strong> per search. Do not close this tab.</span>
+        <span class="icon">⏳</span>
+        <span>Each keyword opens a real browser — <strong>30s–15min per keyword</strong> depending on result count. Do not close this tab.</span>
       </div>
 
       <button class="btn-search" type="submit" id="search-btn">
@@ -51,29 +71,58 @@
     </form>
   </div>
 
+  <!-- Status -->
   <div id="status-bar">
     <div class="spinner"></div>
     <div>
       <div id="status-text">Opening browser…</div>
-      <div class="status-detail">Browser is running in the background — please wait</div>
+      <div class="status-detail" id="status-detail">Browser is running in the background — please wait</div>
     </div>
   </div>
 
+  <!-- Error -->
   <div id="error-toast">
-    <span>&#9888;&#65039;</span>
+    <span>⚠️</span>
     <span id="error-msg"></span>
   </div>
 
-  <div id="empty-state">
-    <div class="icon">&#128506;&#65039;</div>
-    <h3>No results found</h3>
-    <p>Try a different keyword or add a city name.</p>
+  <!-- Dedup Stats -->
+  <div id="dedup-stats" style="display:none">
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-scraped">0</div>
+        <div class="stat-label">Total Scraped</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-num" id="stat-new">0</div>
+        <div class="stat-label">New Unique</div>
+      </div>
+      <div class="stat-card amber">
+        <div class="stat-num" id="stat-dupes">0</div>
+        <div class="stat-label">Duplicates Skipped</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-num" id="stat-db">0</div>
+        <div class="stat-label">Total in DB</div>
+      </div>
+    </div>
+
+    <!-- Per-query breakdown -->
+    <div id="query-breakdown"></div>
   </div>
 
+  <!-- Empty state -->
+  <div id="empty-state">
+    <div class="icon">🗺️</div>
+    <h3>No new results found</h3>
+    <p>All results may already be in the database, or try different keywords.</p>
+  </div>
+
+  <!-- Results -->
   <div id="results-area" style="display:none">
     <div class="results-header">
       <div class="results-count">
-        Results <span class="count-badge" id="result-count">0</span>
+        New Results <span class="count-badge" id="result-count">0</span>
       </div>
       <div class="export-btns">
         <button class="btn-export" onclick="exportData('excel')">
@@ -99,7 +148,7 @@
       <table>
         <thead>
           <tr>
-            <th>Name</th><th>Category</th><th>Rating</th>
+            <th>#</th><th>Name</th><th>Category</th><th>Rating</th>
             <th>Reviews</th><th>Phone</th><th>Address</th><th>Website</th>
           </tr>
         </thead>
@@ -111,4 +160,4 @@
 </div>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
-</html>
+</html> 
