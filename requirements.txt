@@ -39,6 +39,7 @@ python-dateutil
 pytz
 six
 typing-extensions
+playwright
 
 # ─── Database (SQLite is built into Python) ──────────
 # No extra install needed for sqlite3 
